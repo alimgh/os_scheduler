@@ -1,10 +1,7 @@
 //
 // Created by alimgh on 1/27/21.
 //
-
-//#include "stdlib.h"
-#include <unistd.h>
-#include "stdio.h"
+#include <stdio.h>
 #include "scheduler.h"
 
 p_type typeX, typeY, typeZ;
@@ -101,8 +98,8 @@ process runProcess() {
     scheduling();
 
     if (ready_q_size == 0) {
-        sem_post(&ready_mutex);
         sem_post(&resources_mutex);
+        sem_post(&ready_mutex);
         return idle;
     }
 
@@ -122,8 +119,8 @@ process runProcess() {
 
     if (resources[0] < p->type.pt_resources[0] || resources[1] < p->type.pt_resources[1] ||
         resources[2] < p->type.pt_resources[2]) {
-        sem_post(&ready_mutex);
         sem_post(&resources_mutex);
+        sem_post(&ready_mutex);
         return idle;
     }
 
@@ -140,8 +137,8 @@ void unWaitProcess(process p) {
 //    if (waiting_q_size == 0)
 //        exit(3);
 
-    sem_wait(&waiting_mutex);
     sem_wait(&ready_mutex);
+    sem_wait(&waiting_mutex);
 
     int i, lidx;
     i = 0;
@@ -155,8 +152,8 @@ void unWaitProcess(process p) {
     waiting_q_size--;
     waiting_q[i] = waiting_q[waiting_q_size];
 
-    sem_post(&ready_mutex);
     sem_post(&waiting_mutex);
+    sem_post(&ready_mutex);
 }
 
 void waitProcess(process p) {
@@ -180,8 +177,8 @@ void readyProcesses(process p) {
 
     ready_q_size++;
 
-    int i;
-    int idx = (ready_q_start + ready_q_size - 1) % LIST_SIZE;
+    int i, idx;
+    idx = (ready_q_start + ready_q_size - 1) % LIST_SIZE;
 
     ready_q[idx] = p;
     ready_q[idx].p_running_time = 0;
@@ -196,7 +193,6 @@ void readyProcesses(process p) {
 void terminate(process p) {
 
     sem_wait(&resources_mutex);
-    printf("Terminate: %s\n", p.p_name);
 
     int i;
     process* p_tmp;

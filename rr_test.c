@@ -1,4 +1,4 @@
-#include "fcfs.h"
+#include "rr.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,10 +27,8 @@ void* cpu(void* idx) {
                 }
                 idle_time[*(int*)idx] += s_time - c_time;
             }
-            else if (p.p_running_time >= p.p_cpu_burst_time) {
+            else if (p.p_running_time >= p.p_cpu_burst_time || p.p_total_run >= p.p_duration) {
                 if (p.p_total_run >= p.p_duration){
-                    idle_time[*(int*)idx] += p.p_total_run - p.p_duration;
-
                     printf("CPU%d: Terminate %s\n", *(int*)idx, p.p_name);
                     terminate(p);
                 }
@@ -107,10 +105,10 @@ int main() {
 /* test
 8 8 8
 5
-T1 Y 7
+T1 Z 7
 T2 X 4
 T3 X 2
-T4 Z 6
+T4 Y 6
 T5 Y 3
 
 1 1 1
