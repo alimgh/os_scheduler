@@ -27,10 +27,8 @@ void* cpu(void* idx) {
                 }
                 idle_time[*(int*)idx] += s_time - c_time;
             }
-            else if (p.p_running_time >= p.p_cpu_burst_time) {
+            else if (p.p_running_time >= p.p_cpu_burst_time || p.p_total_run >= p.p_duration) {
                 if (p.p_total_run >= p.p_duration){
-                    idle_time[*(int*)idx] += p.p_total_run - p.p_duration;
-
                     printf("CPU%d: Terminate %s\n", *(int*)idx, p.p_name);
                     terminate(p);
                 }

@@ -1,4 +1,4 @@
-#include "fcfs.h"
+#include "multilevel.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +10,13 @@ int     idle_time[4];
 void* cpu(void* idx) {
     int c_time = 0;
 //    scheduling();
-    process p = runProcess();
+    process p;
+    if (p1_q_size)
+        p = p1RunProcess();
+    else if (p2_q_size)
+        p = p2RunProcess();
+    else
+        p = p3RunProcess();
     running_q[*(int*)idx] = p;
     idle_time[*(int*)idx] = 0;
 
@@ -22,7 +28,13 @@ void* cpu(void* idx) {
             if (p.pid == -1) {
                 if (ready_q_size > 0) {
 //                    scheduling();
-                    p = runProcess();
+//                    p = runProcess();
+                    if (p1_q_size)
+                        p = p1RunProcess();
+                    else if (p2_q_size)
+                        p = p2RunProcess();
+                    else
+                        p = p3RunProcess();
                     running_q[*(int*)idx] = p;
                 }
                 idle_time[*(int*)idx] += s_time - c_time;
@@ -30,13 +42,30 @@ void* cpu(void* idx) {
             else if (p.p_running_time >= p.p_cpu_burst_time || p.p_total_run >= p.p_duration) {
                 if (p.p_total_run >= p.p_duration){
                     printf("CPU%d: Terminate %s\n", *(int*)idx, p.p_name);
-                    terminate(p);
+                    if (p.type.pt_priority == 1)
+                        p1Terminate(p);
+                    else if (p.type.pt_priority == 2)
+                        p2Terminate(p);
+                    else
+                        p3Terminate(p);
                 }
-                else
-                    readyProcesses(p);
+                else {
+                    if (p.type.pt_priority == 1)
+                        p1ReadyProcesses(p);
+                    else if (p.type.pt_priority == 2)
+                        p2ReadyProcesses(p);
+                    else
+                        p3ReadyProcesses(p);
+                }
 
 //                scheduling();
-                p = runProcess();
+//                p = runProcess();
+                if (p1_q_size)
+                    p = p1RunProcess();
+                else if (p2_q_size)
+                    p = p2RunProcess();
+                else
+                    p = p3RunProcess();
                 running_q[*(int*)idx] = p;
             }
             c_time = s_time;
@@ -69,14 +98,36 @@ int main() {
     while (p_count) {
         printf("A:%d B:%d C:%d\n\n", resources[0], resources[1], resources[2]);
 
-        printf("ready queue:   ");
+        printf("p1 queue:   ");
 
-        if (ready_q_size) {
-            lidx = (ready_q_start + ready_q_size-1) % LIST_SIZE;
-            for (i=ready_q_start; i<lidx; i=(i+1)%LIST_SIZE) {
-                printf("%s-", ready_q[i].p_name);
+        if (p1_q_size) {
+            lidx = (p1_q_start + p1_q_size-1) % LIST_SIZE;
+            for (i=p1_q_start; i<lidx; i=(i+1)%LIST_SIZE) {
+                printf("%s-", p1_q[i].p_name);
             }
-            printf("%s", ready_q[lidx].p_name);
+            printf("%s", p1_q[lidx].p_name);
+        }
+        printf("\n\n");
+
+        printf("p2 queue:   ");
+
+        if (p2_q_size) {
+            lidx = (p2_q_start + p2_q_size-1) % LIST_SIZE;
+            for (i=p2_q_start; i<lidx; i=(i+1)%LIST_SIZE) {
+                printf("%s-", p2_q[i].p_name);
+            }
+            printf("%s", p2_q[lidx].p_name);
+        }
+        printf("\n\n");
+
+        printf("p3 queue:   ");
+
+        if (p3_q_size) {
+            lidx = (p3_q_start + p3_q_size-1) % LIST_SIZE;
+            for (i=p3_q_start; i<lidx; i=(i+1)%LIST_SIZE) {
+                printf("%s-", p3_q[i].p_name);
+            }
+            printf("%s", p3_q[lidx].p_name);
         }
         printf("\n\n");
 
@@ -103,13 +154,15 @@ int main() {
 
 
 /* test
-8 8 8
-5
+10 10 10
+7
 T1 Y 7
-T2 X 4
+T2 Z 4
 T3 X 2
 T4 Z 6
-T5 Y 3
+T5 Z 1
+T6 Z 2
+T7 Z 3
 
 1 1 1
 3

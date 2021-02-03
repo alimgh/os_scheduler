@@ -34,6 +34,11 @@ typedef struct {
     // 2: running
     // 3: waiting
 
+    int p_level;
+    // 1: level1
+    // 2: level2
+    // 3: level3
+
 //    int p_resources[3];
 } process;
 

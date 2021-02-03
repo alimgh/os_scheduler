@@ -12,8 +12,8 @@ sem_t resources_mutex;
 
 process idle;
 
-process ready_q   [10];
-process waiting_q [10];
+process ready_q   [LIST_SIZE];
+process waiting_q [LIST_SIZE];
 int     resources [3];
 
 int ready_q_start   = 0;
