@@ -63,22 +63,14 @@ void initializeProcesses() {
 //    process p;
     char pt;
 
-//    printf("a: %d\n", resources[0]);
     scanf("%d", &resources[0]);
-//    printf("a: %d\n", resources[0]);
-//    printf("b: %d\n", resources[1]);
     scanf("%d", &resources[1]);
-//    printf("b: %d\n", resources[1]);
-//    printf("c: %d\n", resources[2]);
     scanf("%d", &resources[2]);
-//    printf("c: %d\n", resources[2]);
 
     scanf("%d", &t);
     p_count = t;
     for (i=0; i<p_count; i++) {
         scanf("%s %s %d", ready_q[i].p_name, &pt, &(ready_q[i].p_duration));
-//        scanf("%s", &pt);
-//        scanf("%d", &(ready_q[i].p_duration));
 
         switch (pt) {
             case 'X':
@@ -97,11 +89,6 @@ void initializeProcesses() {
 
         ready_q_size++;
     }
-
-//    for (i=0; i<p_count; i++) {
-//        printf("%d\n", ready_q[i].pid);
-//    }
-//    printf("\n\n----%d\n", ready_q_size);
 }
 
 process runProcess() {
@@ -142,7 +129,6 @@ process runProcess() {
 
     for (i=0; i<3; i++)
         resources[i] -= (p->type).pt_resources[i];
-//    printf("A:%d B:%d C:%d\n\n", (p->type).pt_resources[0], (p->type).pt_resources[1], (p->type).pt_resources[2]);
 
     sem_post(&resources_mutex);
     sem_post(&ready_mutex);
@@ -162,26 +148,12 @@ void unWaitProcess(process p) {
     while (waiting_q[i].pid != p.pid)
         i++;
 
-//    waiting_q[i] = waiting_q[waiting_q_size-1];
-    waiting_q_size--;
-
     lidx = (ready_q_start + ready_q_size) % LIST_SIZE;
     ready_q_size++;
-
     ready_q[lidx] = waiting_q[i];
+
+    waiting_q_size--;
     waiting_q[i] = waiting_q[waiting_q_size];
-//    waiting_q[i].p_name[0] = waiting_q[waiting_q_size].p_name[0];
-//    waiting_q[i].p_name[1] = waiting_q[waiting_q_size].p_name[1];
-//    waiting_q[i].p_name[2] = waiting_q[waiting_q_size].p_name[2];
-//    waiting_q[i].p_name[3] = waiting_q[waiting_q_size].p_name[3];
-//    waiting_q[i].p_name[4] = waiting_q[waiting_q_size].p_name[4];
-//
-//    waiting_q[i].pid = waiting_q[waiting_q_size].pid;
-//    waiting_q[i].type = waiting_q[waiting_q_size].type;
-//    waiting_q[i].p_duration = waiting_q[waiting_q_size].p_duration;
-//    waiting_q[i].p_total_run = waiting_q[waiting_q_size].p_total_run;
-//    waiting_q[i].p_running_time = waiting_q[waiting_q_size].p_running_time;
-//    waiting_q[i].p_cpu_burst_time = waiting_q[waiting_q_size].p_cpu_burst_time;
 
     sem_post(&ready_mutex);
     sem_post(&waiting_mutex);
@@ -192,26 +164,10 @@ void waitProcess(process p) {
 //        exit(3);
 
     sem_wait(&waiting_mutex);
-//    sem_wait(&resources_mutex);
 
     waiting_q[waiting_q_size] = p;
-
-//    waiting_q[waiting_q_size].p_name[0] = p.p_name[0];
-//    waiting_q[waiting_q_size].p_name[1] = p.p_name[1];
-//    waiting_q[waiting_q_size].p_name[2] = p.p_name[2];
-//    waiting_q[waiting_q_size].p_name[3] = p.p_name[3];
-//    waiting_q[waiting_q_size].p_name[4] = p.p_name[4];
-//
-//    waiting_q[waiting_q_size].pid = p.pid;
-//    waiting_q[waiting_q_size].type = p.type;
-//    waiting_q[waiting_q_size].p_duration = p.p_duration;
-//    waiting_q[waiting_q_size].p_total_run = p.p_total_run;
-//    waiting_q[waiting_q_size].p_running_time = p.p_running_time;
-//    waiting_q[waiting_q_size].p_cpu_burst_time = p.p_cpu_burst_time;
-
     waiting_q_size++;
 
-//    sem_post(&resources_mutex);
     sem_post(&waiting_mutex);
 }
 
@@ -222,7 +178,6 @@ void readyProcesses(process p) {
     sem_wait(&ready_mutex);
     sem_wait(&resources_mutex);
 
-//    printf("%d\n",ready_q_size);
     ready_q_size++;
 
     int i;
@@ -230,19 +185,6 @@ void readyProcesses(process p) {
 
     ready_q[idx] = p;
     ready_q[idx].p_running_time = 0;
-
-//    ready_q[idx].p_name[0] = p.p_name[0];
-//    ready_q[idx].p_name[1] = p.p_name[1];
-//    ready_q[idx].p_name[2] = p.p_name[2];
-//    ready_q[idx].p_name[3] = p.p_name[3];
-//    ready_q[idx].p_name[4] = p.p_name[4];
-//
-//    ready_q[idx].pid = p.pid;
-//    ready_q[idx].type = p.type;
-//    ready_q[idx].p_duration = p.p_duration;
-//    ready_q[idx].p_total_run = p.p_total_run;
-//    ready_q[idx].p_running_time = p.p_running_time;
-//    ready_q[idx].p_cpu_burst_time = p.p_cpu_burst_time;
 
     for (i=0; i<3; i++)
         resources[i] += p.type.pt_resources[i];
@@ -270,7 +212,6 @@ void terminate(process p) {
             unWaitProcess(*p_tmp);
     }
     p_count--;
-//    sleep(1);
 
     sem_post(&resources_mutex);
 }

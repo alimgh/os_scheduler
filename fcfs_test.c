@@ -57,7 +57,6 @@ int main() {
 
     initialize();
     initializeProcesses();
-//    printf("A:%d B:%d C:%d\n\n", resources[0], resources[1], resources[2]);
     initializeCPUBurst();
 
     pthread_create(&cpu1, NULL, cpu, (void *) c1);

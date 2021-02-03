@@ -55,10 +55,7 @@ extern process  waiting_q [LIST_SIZE];
 //extern int      cpu_count;
 extern int      ready_q_start;
 extern int      ready_q_size;
-//extern int      waiting_q_start;
 extern int      waiting_q_size;
-//extern int      running_q_start;
-//extern int      running_q_size;
 extern int      s_time; // simulator
 extern int      p_count;
 

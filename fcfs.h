@@ -8,6 +8,6 @@
 #include "scheduler.h"
 
 void initializeCPUBurst(); // scheduler
-void scheduling(); // scheduler
+//void scheduling(); // scheduler
 
 #endif //SCHEDULER_FCFS_H
