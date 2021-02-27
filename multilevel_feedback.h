@@ -22,9 +22,9 @@ extern int      p3_q_start;
 extern int      p3_q_size;
 
 /*
- * p1: SJF
- * p2: FCFS
- * p3: RR
+ * p1: RR Quantum = 1
+ * p2: RR Quantum = 2
+ * p3: FCFS
  * */
 
 void    initializeCPUBurst  (); // scheduler

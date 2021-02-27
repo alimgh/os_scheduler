@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include "scheduler.h"
 
+/*
+ * creating global variables
+ * */
+
 p_type typeX, typeY, typeZ;
 
 sem_t ready_mutex;
@@ -23,6 +27,9 @@ int waiting_q_size  = 0;
 int s_time          = 0;
 int p_count;
 
+/*
+ * initializing values like semaphores and process types and Idle process
+ * */
 void initialize() {
     sem_init(&ready_mutex, 0, 1);
     sem_init(&waiting_mutex, 0, 1);
@@ -55,6 +62,9 @@ void initialize() {
     idle.p_total_run = 0;
 }
 
+/*
+ * get Tasks from user
+ * */
 void initializeProcesses() {
     int t, i;
 //    process p;
@@ -88,6 +98,9 @@ void initializeProcesses() {
     }
 }
 
+/*
+ * scheduler will return task which should run
+ * */
 process runProcess() {
 //    if (ready_q_size == 0)
 //        exit(3);
@@ -95,13 +108,13 @@ process runProcess() {
     sem_wait(&ready_mutex);
     sem_wait(&resources_mutex);
 
-    scheduling();
-
     if (ready_q_size == 0) {
         sem_post(&resources_mutex);
         sem_post(&ready_mutex);
         return idle;
     }
+
+    scheduling();
 
     int i;
     process* p;
@@ -133,6 +146,9 @@ process runProcess() {
     return *p;
 }
 
+/*
+ * move Process from ready queue to waiting queue
+ * */
 void unWaitProcess(process p) {
 //    if (waiting_q_size == 0)
 //        exit(3);
@@ -156,6 +172,9 @@ void unWaitProcess(process p) {
     sem_post(&ready_mutex);
 }
 
+/*
+ * move Process from running to waiting
+ * */
 void waitProcess(process p) {
 //    if (waiting_q_size == 10)
 //        exit(3);
@@ -168,6 +187,9 @@ void waitProcess(process p) {
     sem_post(&waiting_mutex);
 }
 
+/*
+ * move Process from running to ready queue and release it's resources
+ * */
 void readyProcesses(process p) {
 //    if (ready_q_size == 10)
 //        exit(3);
@@ -178,6 +200,8 @@ void readyProcesses(process p) {
     ready_q_size++;
 
     int i, idx;
+    process* p_tmp;
+    p_type pt_tmp;
     idx = (ready_q_start + ready_q_size - 1) % LIST_SIZE;
 
     ready_q[idx] = p;
@@ -186,10 +210,21 @@ void readyProcesses(process p) {
     for (i=0; i<3; i++)
         resources[i] += p.type.pt_resources[i];
 
+//    for (i=0; i<waiting_q_size; i++) {
+//        p_tmp = &waiting_q[0];
+//        pt_tmp = p_tmp->type;
+//        if (resources[0] >= pt_tmp.pt_resources[0] && resources[1] >= pt_tmp.pt_resources[1] &&
+//            resources[2] >= pt_tmp.pt_resources[2])
+//            unWaitProcess(*p_tmp);
+//    }
+
     sem_post(&resources_mutex);
     sem_post(&ready_mutex);
 }
 
+/*
+ * terminate process and release it's resources
+ * */
 void terminate(process p) {
 
     sem_wait(&resources_mutex);

@@ -4,8 +4,8 @@
 
 #include "multilevel_feedback.h"
 
-#define QUANTUM1 1
-#define QUANTUM2 2
+#define QUANTUM1 6
+#define QUANTUM2 8
 
 sem_t   p1_mutex;
 sem_t   p2_mutex;
